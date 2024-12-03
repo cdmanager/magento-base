@@ -74,7 +74,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
 
       - name: Prepare auth.json
-        run: echo "${{ secrets.MAGENTO_AUTH_JSON }}" > auth.json
+        run: echo "${{ env.MAGENTO_AUTH_JSON }}" > auth.json
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
