@@ -26,7 +26,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # Copy initial files needed for installation into the current working directory
-COPY composer.json auth.json Thumbnail.php ./
+COPY composer.json Thumbnail.php ./
 
 # Ensure proper ownership and permissions
 RUN chown -R www-data:www-data /var/www /var/www/html  \
