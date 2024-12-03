@@ -9,6 +9,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ghcr.io/${{ github.repository }}
   FULL_IMAGE_NAME: ghcr.io/${{ github.repository }}:${{ github.sha }}
+  MAGENTO_AUTH_JSON: ${{ vars.MAGENTO_AUTH_JSON }}
 
 jobs:
   setup-magento:
@@ -75,7 +76,7 @@ jobs:
 
       - name: Prepare auth.json
         run: |
-          echo "${{ env.MAGENTO_AUTH_JSON }}" > auth.json
+          echo $MAGENTO_AUTH_JSON > auth.json
           cat auth.json
           cat auth.json | jq .  # Optional: Validate JSON using jq
 
