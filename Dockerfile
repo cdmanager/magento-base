@@ -72,7 +72,7 @@ ARG MAGENTO_CLI=/var/www/html/bin/magento
 RUN $MAGENTO_CLI setup:install \
     --base-url=https://magento.acme.com/ \
     --base-url-secure=https://magento.acme.com/ \
-    --db-host=mariadb \
+    --db-host=localhost \
     --db-name=magento \
     --db-user=db_user \
     --db-password=db_password \
@@ -86,7 +86,7 @@ RUN $MAGENTO_CLI setup:install \
     --timezone=America/New_York \
     --use-rewrites=1 \
     --search-engine=elasticsearch7 \
-    --elasticsearch-host=elasticsearch && \
+    --elasticsearch-host=localhost && \
     $MAGENTO_CLI cache:clean && \
     $MAGENTO_CLI cache:flush
 
