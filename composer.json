@@ -1,0 +1,55 @@
+{
+    "name": "acme/magento-2.4.7",
+    "description": "Magento Base",
+    "type": "project",
+    "version": "1.0",
+    "require": {
+        "php": "~8.1.0||~8.2.0",
+        "ext-bcmath": "*",
+        "ext-ctype": "*",
+        "ext-curl": "*",
+        "ext-dom": "*",
+        "ext-gd": "*",
+        "ext-intl": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "ext-pdo_mysql": "*",
+        "ext-simplexml": "*",
+        "ext-soap": "*",
+        "ext-sockets": "*",
+        "ext-xsl": "*",
+        "ext-zip": "*",
+        "composer/composer": "^2.0",
+        "magento/product-community-edition": "2.4.7-p2"
+    },
+    "config": {
+        "use-include-path": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "magento/inventory-composer-installer": true,
+            "magento/composer-root-update-plugin": true,
+            "magento/magento-composer-installer": true,
+            "composer/installers": true,
+            "laminas/laminas-dependency-plugin": true,
+            "magento/composer-dependency-version-audit-plugin": true
+        }
+    },
+    "autoload": {
+        "psr-0": {
+            "": [
+                "app/code/",
+                "generated/code/"
+            ]
+        },
+        "psr-4": {
+            "Magento\\": "app/code/Magento/",
+            "Magento\\Framework\\": "lib/internal/Magento/Framework/",
+            "Magento\\Setup\\": "setup/src/Magento/Setup/",
+            "Zend\\Mvc\\Controller\\": "setup/src/Zend/Mvc/Controller/"
+        },
+        "files": [
+            "app/etc/NonComposerComponentRegistration.php"
+        ]
+    }
+}
