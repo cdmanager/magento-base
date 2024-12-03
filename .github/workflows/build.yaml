@@ -56,6 +56,8 @@ jobs:
       # multi-platform images and export cache
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # v3.0.0
+        with:
+          driver-opts: network=host
 
       # Login against a Docker registry except on PR
       - name: Log into registry ${{ env.REGISTRY }}
@@ -75,10 +77,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
 
       - name: Prepare auth.json
-        run: |
-          echo $MAGENTO_AUTH_JSON > auth.json
-          cat auth.json
-          cat auth.json | jq .  # Optional: Validate JSON using jq
+        run: echo $MAGENTO_AUTH_JSON > auth.json
 
 
       # Build and push Docker image with Buildx (don't push on PR)
