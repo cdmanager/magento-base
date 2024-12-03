@@ -42,5 +42,8 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
+      - name: Prepare auth.json
+        run: echo "${{ secrets.MAGENTO_AUTH_JSON }}" > /var/www/html/auth.json
+
       - name: Build Magento Docker image
         run: docker build . -t my-magento
