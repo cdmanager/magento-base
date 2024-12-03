@@ -1,0 +1,46 @@
+name: Magento Base Installation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  setup-magento:
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: docker.io/bitnami/mariadb:10.6
+        env:
+          - MARIADB_USER=db_user
+          - MARIADB_DATABASE=magento
+          - MARIADB_ROOT_PASSWORD=root_password
+          - MARIADB_PASSWORD=db_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+        ports:
+          - 9200:9200
+        env:
+          discovery.type: single-node
+        options: >-
+          --health-cmd="curl http://localhost:9200/_cluster/health"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build Magento Docker image
+      run: docker build . -t my-magento
