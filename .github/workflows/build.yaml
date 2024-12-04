@@ -25,21 +25,10 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping --silent"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -p $MARIADB_ROOT_PASSWORD --silent"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=3
-      elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
-        ports:
-          - 9200:9200
-        env:
-          discovery.type: single-node
-        options: >-
-          --health-cmd="curl -f http://localhost:9200/_cluster/health || exit 1"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+          --health-retries=5
 
     steps:
       - name: Checkout code
@@ -48,35 +37,26 @@ jobs:
       - name: Install MySQL Client
         run: sudo apt-get update && sudo apt-get install -y mysql-client
 
-      - name: Test MariaDB Connection
+      - name: Wait for Database Connection
         env:
           MYSQL_PWD: root_password
         run: |
-          echo "Checking network configuration..."
-          ip addr
-          echo "Checking /etc/hosts..."
-          cat /etc/hosts
-          echo "Attempting to resolve mariadb hostname..."
-          getent hosts mariadb
-          echo "Checking MySQL client configuration..."
-          mysql --version
-          echo "Checking service configuration..."
-          netstat -tuln
-          
           echo "Waiting for MariaDB to be ready..."
           max_attempts=30
-          attempt=0
-          while [ $attempt -lt $max_attempts ]; do
-            if mysqladmin ping -h mariadb -P 3306 -u root -p"$MYSQL_PWD" --silent; then
-              echo "Database is ready!"
-              exit 0
+          for ((attempt=1; attempt<=max_attempts; attempt++)); do
+            if mysql -h 127.0.0.1 -u root -p"$MYSQL_PWD" -e "SELECT 1" > /dev/null 2>&1; then
+              echo "Database is ready after $attempt attempts!"
+              break
             fi
-            echo "Waiting for database connection... (Attempt $((attempt+1))/$max_attempts)"
+            
+            if [ $attempt -eq $max_attempts ]; then
+              echo "ERROR: Database connection failed after $max_attempts attempts"
+              exit 1
+            fi
+            
+            echo "Waiting for database connection... (Attempt $attempt/$max_attempts)"
             sleep 2
-            ((attempt++))
           done
-          echo "Database connection failed after $max_attempts attempts"
-          exit 1
 
       # Install the cosign tool except on PR
       - name: Install cosign
@@ -122,7 +102,6 @@ jobs:
           allow: network.host
           context: ./
           push: ${{ github.event_name != 'pull_request' }}
-          #tags: ${{ steps.meta.outputs.tags }}
           tags: |
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.FULL_IMAGE_NAME }}
