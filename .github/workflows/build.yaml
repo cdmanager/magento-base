@@ -49,8 +49,10 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y mysql-client
 
       - name: Test MariaDB Connection
+        env:
+          MYSQL_PWD: root_password
         run: |
-          timeout 60s bash -c 'until mysqladmin ping -h mariadb -u root -p root_password --silent; do sleep 1; done'
+          timeout 60s bash -c 'until mysqladmin ping -h mariadb -u root --silent; do sleep 1; done'
           mysql -h mariadb -P 3306 -u root -p root_password -e "SHOW DATABASES;"
 
       # Install the cosign tool except on PR
