@@ -50,8 +50,10 @@ jobs:
 
       - name: Test MariaDB Connection
         run: |
-          mysql -h mariadb -P 3306 -u root -p root_password -e "SHOW DATABASES;"
           mysql -h localhost -P 3306 -u root -p root_password -e "SHOW DATABASES;"
+          sudo echo "127.0.0.1 mariadb" | sudo tee -a /etc/hosts
+          timeout 60s bash -c 'until mysqladmin ping -h mariadb -u root -p root_password --silent; do sleep 1; done'
+          mysql -h mariadb -P 3306 -u root -p root_password -e "SHOW DATABASES;"
 
       # Install the cosign tool except on PR
       - name: Install cosign
