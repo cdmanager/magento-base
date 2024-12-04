@@ -52,14 +52,31 @@ jobs:
         env:
           MYSQL_PWD: root_password
         run: |
-          echo "Waiting for MariaDB to be ready..."
-          timeout 90s bash -c '
-          while ! mysqladmin ping -h mariadb -P 3306 -u root -p "$MYSQL_PWD" --silent; do 
-            echo "Waiting for database connection...";
-            sleep 2;
-          done
-          echo "Database is ready!"
-          '
+        echo "Checking network configuration..."
+        ip addr
+        echo "Checking /etc/hosts..."
+        cat /etc/hosts
+        echo "Attempting to resolve mariadb hostname..."
+        getent hosts mariadb
+        echo "Checking MySQL client configuration..."
+        mysql --version
+        echo "Checking service configuration..."
+        netstat -tuln
+        
+        echo "Waiting for MariaDB to be ready..."
+        max_attempts=30
+        attempt=0
+        while [ $attempt -lt $max_attempts ]; do
+          if mysqladmin ping -h mariadb -P 3306 -u root -p"$MYSQL_PWD" --silent; then
+            echo "Database is ready!"
+            exit 0
+          fi
+          echo "Waiting for database connection... (Attempt $((attempt+1))/$max_attempts)"
+          sleep 2
+          ((attempt++))
+        done
+        echo "Database connection failed after $max_attempts attempts"
+        exit 1
 
       # Install the cosign tool except on PR
       - name: Install cosign
