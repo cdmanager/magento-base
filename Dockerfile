@@ -73,7 +73,7 @@ ARG MAGENTO_CLI=/var/www/html/bin/magento
 RUN $MAGENTO_CLI setup:install \
     --base-url=https://magento.acme.com/ \
     --base-url-secure=https://magento.acme.com/ \
-    --db-host=127.0.01 \
+    --db-host=127.0.0.1 \
     --db-name=magento \
     --db-user=db_user \
     --db-password=db_password \

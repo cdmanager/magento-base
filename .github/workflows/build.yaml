@@ -57,6 +57,26 @@ jobs:
             echo "Waiting for database connection... (Attempt $attempt/$max_attempts)"
             sleep 2
           done
+        
+      - name: Wait for Elasticsearch Connection
+        run: |
+            echo "Waiting for Elasticsearch to be ready..."
+            max_attempts=30
+            for ((attempt=1; attempt<=max_attempts; attempt++)); do
+              if curl --silent --fail http://localhost:9200/_cluster/health > /dev/null 2>&1; then
+                echo "Elasticsearch is ready after $attempt attempts!"
+                break
+              fi
+              
+              if [ $attempt -eq $max_attempts ]; then
+                echo "ERROR: Elasticsearch connection failed after $max_attempts attempts"
+                exit 1
+              fi
+              
+              echo "Waiting for Elasticsearch connection... (Attempt $attempt/$max_attempts)"
+              sleep 2
+            done
+
 
       # Install the cosign tool except on PR
       - name: Install cosign
