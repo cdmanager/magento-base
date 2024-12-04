@@ -63,6 +63,7 @@ RUN sed -i 's/Listen 80/Listen 8080/' /etc/apache2/ports.conf \
 # Expose port 8080
 EXPOSE 8080
 
+FROM build AS install
 
 # Switch back to www-data for running the application
 USER www-data
