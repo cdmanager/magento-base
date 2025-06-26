@@ -1,5 +1,5 @@
 # Use PHP 8.1 with Apache as the base image
-FROM php:8.2-apache AS base
+FROM php:8.1-apache AS base
 
 # Install dependencies and PHP extensions
 RUN apt-get update \
