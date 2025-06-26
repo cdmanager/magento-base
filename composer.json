@@ -26,7 +26,7 @@
         "ext-xsl": "*",
         "ext-zip": "*",
         "composer/composer": "^2.0",
-        "magento/product-community-edition": "2.4.8-p1"
+        "magento/product-community-edition": "2.4.7-p6"
     },
     "config": {
         "use-include-path": true,
