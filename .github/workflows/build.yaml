@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mariadb:
-        image: docker.io/bitnami/mariadb:10.6
+        image: docker.io/bitnamilegacy/mariadb:10.6
         env:
           MARIADB_USER: db_user
           MARIADB_DATABASE: magento
