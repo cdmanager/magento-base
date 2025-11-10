@@ -1,6 +1,6 @@
 services:
   mariadb:
-    image: docker.io/bitnami/mariadb:10.6
+    image: docker.io/bitnamilegacy/mariadb:10.6
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
       - MARIADB_USER=db_user
@@ -32,7 +32,7 @@ services:
       - mariadb
       - elasticsearch
   elasticsearch:
-    image: docker.io/bitnami/elasticsearch:7.9.3
+    image: docker.io/bitnamilegacy/elasticsearch:7.9.3
     volumes:
       - 'elasticsearch_data:/bitnami/elasticsearch/data'
 volumes:
