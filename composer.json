@@ -1,5 +1,5 @@
 {
-    "name": "acme/magento-2.4.8",
+    "name": "acme/magento-2.4.7",
     "description": "Magento Base",
     "type": "project",
     "version": "1.0",
@@ -26,7 +26,7 @@
         "ext-xsl": "*",
         "ext-zip": "*",
         "composer/composer": "^2.0",
-        "magento/product-community-edition": "2.4.7-p6"
+        "magento/product-community-edition": "2.4.7-p8"
     },
     "config": {
         "use-include-path": true,
