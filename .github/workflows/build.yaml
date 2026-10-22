@@ -126,7 +126,7 @@ jobs:
       # the composer_auth build secret.
       - name: Write the Composer credentials for the build
         env:
-          MAGENTO_AUTH_JSON: ${{ secrets.MAGENTO_AUTH_JSON }}
+          MAGENTO_AUTH_JSON: ${{ vars.MAGENTO_AUTH_JSON }}
         run: printf '%s' "$MAGENTO_AUTH_JSON" > "$RUNNER_TEMP/composer-auth.json"
 
       # Build and push Docker image with Buildx (don't push on PR)
