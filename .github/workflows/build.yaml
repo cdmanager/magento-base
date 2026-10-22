@@ -10,7 +10,6 @@ env:
   #IMAGE_NAME: ghcr.io/${{ github.repository }}
   IMAGE_NAME: ghcr.io/${{ github.repository }}:${{github.ref_name}}
   FULL_IMAGE_NAME: ghcr.io/${{ github.repository }}:${{ github.sha }}
-  MAGENTO_AUTH_JSON: ${{ vars.MAGENTO_AUTH_JSON }}
 
 jobs:
   setup-magento:
@@ -123,8 +122,12 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
 
-      - name: Prepare auth.json
-        run: echo $MAGENTO_AUTH_JSON > auth.json
+      # Outside the build context, so it can't be copied into the image; the Dockerfile reads it as
+      # the composer_auth build secret.
+      - name: Write the Composer credentials for the build
+        env:
+          MAGENTO_AUTH_JSON: ${{ secrets.MAGENTO_AUTH_JSON }}
+        run: printf '%s' "$MAGENTO_AUTH_JSON" > "$RUNNER_TEMP/composer-auth.json"
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
@@ -142,3 +145,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          secret-files: |
+            composer_auth=${{ runner.temp }}/composer-auth.json
+
+      - name: Remove the Composer credentials
+        if: always()
+        run: rm -f "$RUNNER_TEMP/composer-auth.json"

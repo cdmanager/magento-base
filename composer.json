@@ -39,6 +39,11 @@
             "composer/installers": true,
             "laminas/laminas-dependency-plugin": true,
             "magento/composer-dependency-version-audit-plugin": true
+        },
+        "audit": {
+            "ignore": {
+                "PKSA-w9tt-7782-78jx": "CVE-2026-102601, league/flysystem <=3.35.2. Magento 2.4.7 requires flysystem ^2.4 and there is no fixed 2.x; resolved by the Magento upgrade (DSA-4923)."
+            }
         }
     },
     "autoload": {
