@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
-# Use PHP 8.1 with Apache as the base image
-FROM php:8.1-apache AS base
+# PHP 8.3 with Apache. Pinned to a patch release: the floating php:8.1-apache tag stopped getting
+# updates when 8.1 reached end of life, and fixes such as 8.3.36 (CVE-2026-109618 / 109619, DSA-5062)
+# should arrive as a deliberate tag bump. 8.3 is the newest PHP that Magento 2.4.7 supports.
+FROM php:8.3.36-apache AS base
 
 # Install dependencies and PHP extensions
 RUN apt-get update \
@@ -24,7 +26,7 @@ RUN apt-get update \
 FROM base AS build
 
 # Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Set the working directory to /var/www/html
 WORKDIR /var/www/html
