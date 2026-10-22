@@ -1,5 +1,8 @@
-# Use PHP 8.1 with Apache as the base image
-FROM php:8.1-apache AS base
+# syntax=docker/dockerfile:1
+# PHP 8.3 with Apache. Pinned to a patch release: the floating php:8.1-apache tag stopped getting
+# updates when 8.1 reached end of life, and fixes such as 8.3.36 (CVE-2026-109618 / 109619, DSA-5062)
+# should arrive as a deliberate tag bump. 8.3 is the newest PHP that Magento 2.4.7 supports.
+FROM php:8.3.36-apache AS base
 
 # Install dependencies and PHP extensions
 RUN apt-get update \
@@ -23,13 +26,16 @@ RUN apt-get update \
 FROM base AS build
 
 # Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Set the working directory to /var/www/html
 WORKDIR /var/www/html
 
-# Copy initial files needed for installation into the current working directory
-COPY composer.json auth.json Thumbnail.php ./
+# Copy initial files needed for installation into the current working directory.
+# auth.json is not copied: the repo.magento.com credentials come in as a build secret below, so
+# they never end up in an image layer (a later `rm` does not remove a file from the layer that
+# added it, and this image is pulled by other builds).
+COPY composer.json Thumbnail.php ./
 
 # Ensure proper ownership and permissions
 RUN chown -R www-data:www-data /var/www /var/www/html  \
@@ -42,14 +48,16 @@ USER www-data
 #RUN mkdir -p /var/www/html/.composer \
 #    && chown -R www-data:www-data /var/www/.composer \
 
-RUN composer install --no-dev --optimize-autoloader --no-interaction \
+# The secret is mounted on a tmpfs for this step only. Build with
+#   docker build --secret id=composer_auth,src=auth.json .
+RUN --mount=type=secret,id=composer_auth,uid=33,required=true \
+    COMPOSER_AUTH="$(cat /run/secrets/composer_auth)" \
+    composer install --no-dev --optimize-autoloader --no-interaction \
     && echo "<h1>It works!</h1>" > /var/www/html/index.html
 
 # Switch back to root to change Apache configuration
 USER root
 
-# remove auth.json
-RUN rm auth.json
 # Configure Apache to run as www-data and use port 8080
 RUN sed -i 's/Listen 80/Listen 8080/' /etc/apache2/ports.conf \
     && sed -i 's/<VirtualHost \*:80>/<VirtualHost *:8080>/' /etc/apache2/sites-available/000-default.conf \
