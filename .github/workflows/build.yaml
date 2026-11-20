@@ -47,7 +47,15 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install MySQL Client
-        run: sudo apt-get update && sudo apt-get install -y mysql-client
+        # ubuntu-latest already ships a mysql client. Installing the package again upgrades the
+        # preinstalled mysql-server too, and its postinst fails on the runner (DSA-5429), so only
+        # install when the client is missing.
+        run: |
+          if command -v mysql >/dev/null 2>&1; then
+            mysql --version
+          else
+            sudo apt-get update && sudo apt-get install -y --no-install-recommends mysql-client
+          fi
 
       - name: Wait for Database Connection
         env:
